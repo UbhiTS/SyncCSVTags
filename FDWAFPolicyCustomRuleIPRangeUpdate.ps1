@@ -30,15 +30,12 @@ function FDWAFPolicyCustomRuleIPRangeUpdate {
     Connect-AzAccount -Subscription $subscriptionId
 
     $wafPolicy = Get-AzFrontDoorWafPolicy -ResourceGroupName $resourceGroupName -Name $wafPolicyName
-
     $existingRule = $wafPolicy.CustomRules | Where-Object { $_.Name -eq $customRuleName }
 
     if ($existingRule) {
         $existingIPRanges = $existingRule.MatchConditions | Where-Object { $_.MatchVariable -eq "RemoteAddr" } | Select-Object -ExpandProperty MatchValue
-
         $newIPRanges = $ipRanges | Where-Object { $existingIPRanges -notcontains $_ }
         $existingIPRanges += $newIPRanges
-
         $existingIPRanges = $existingIPRanges | Where-Object { $ipRanges -contains $_ }
 
         $existingRule.MatchConditions = @(
@@ -53,7 +50,6 @@ function FDWAFPolicyCustomRuleIPRangeUpdate {
     }
 
     Update-AzFrontDoorWafPolicy -InputObject $wafPolicy
-
     Write-Output "Custom rule added or updated in WAF policy successfully."
 }
 
